@@ -6,7 +6,10 @@ export function Footer() {
       <div className="section-wrap">
         <div className="grid grid-adaptive-4 gap-10 border-b border-white/15 pb-12 sm:gap-8 md:pb-16">
           <div className="sm:col-span-2 lg:col-span-2 lg:pr-20">
-            <p className="font-display text-xl font-semibold tracking-[0.22em]">AMBOT365</p>
+            <div className="flex items-center gap-3">
+              <img src="/ambot-logo.png" alt="Ambot365 Logo" className="h-7 w-auto object-contain" />
+              <span className="font-display text-xl font-semibold tracking-[0.22em]">AMBOT365</span>
+            </div>
             <h2 className="mt-8 font-serif text-[34px] leading-[1.08] tracking-tight sm:text-[46px] md:text-[58px]">Live with things<br /><em className="text-gold">worth keeping.</em></h2>
             <form onSubmit={(event) => event.preventDefault()} className="mt-8 flex max-w-lg border-b border-white/30">
               <label htmlFor="email" className="sr-only">Email address</label>

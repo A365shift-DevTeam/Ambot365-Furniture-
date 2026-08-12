@@ -51,10 +51,8 @@ export function Navbar() {
         }`}
       >
         <div className="section-wrap flex h-full items-center justify-between gap-4">
-          <button onClick={() => goTo('top')} className="focus-ring flex items-center gap-2.5 active:opacity-70" aria-label="Ambot365 home">
-            <span className="grid size-7 place-items-center rounded-full border border-gold/70 md:size-8">
-              <span className="size-1.5 rounded-full bg-gold md:size-2" />
-            </span>
+          <button onClick={() => goTo('top')} className="focus-ring flex items-center gap-3 active:opacity-70" aria-label="Ambot365 home">
+            <img src="/ambot-logo.png" alt="Ambot365 Logo" className="h-7 w-auto object-contain md:h-8" />
             <span className="font-display text-sm font-semibold tracking-[0.22em] md:text-[16px]">AMBOT365</span>
           </button>
 
