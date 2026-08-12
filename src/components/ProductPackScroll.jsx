@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -31,7 +31,7 @@ export function ProductPackScroll({ mobileContent }) {
     context.setTransform(dpr, 0, 0, dpr, 0, 0)
     context.imageSmoothingEnabled = true
     context.imageSmoothingQuality = 'high'
-    context.fillStyle = '#0f1211'
+    context.fillStyle = '#faf7f2'
     context.fillRect(0, 0, bounds.width, bounds.height)
 
     const scale = isMobile
@@ -83,15 +83,14 @@ export function ProductPackScroll({ mobileContent }) {
   })
 
   return (
-    <section id="top" ref={containerRef} className="relative h-[550vh] bg-brand-forest lg:h-[500vh]" aria-label="Ambot365 chair in motion">
+    <section id="top" ref={containerRef} className="relative h-[550vh] bg-surface lg:h-[500vh]" aria-label="Ambot365 chair in motion">
       <div className="sticky top-0 h-[100dvh]">
-        <div className="relative w-full bg-brand-forest lg:h-full">
+        <div className="relative w-full bg-surface lg:h-full">
           <canvas ref={canvasRef} className="block aspect-video w-full touch-none lg:h-full lg:aspect-auto" />
-          <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-b from-black/20 via-transparent to-brand-forest/35 lg:block" />
-          <motion.div animate={{ opacity: ready ? 0 : 1 }} transition={{ duration: 0.35 }} className="absolute inset-0 grid place-items-center bg-brand-forest text-parchment" aria-live="polite">
+          <motion.div animate={{ opacity: ready ? 0 : 1 }} transition={{ duration: 0.35 }} className="absolute inset-0 grid place-items-center bg-surface text-ink" aria-live="polite">
             <div className="flex flex-col items-center gap-4">
-              <span className="size-9 animate-spin rounded-full border border-white/20 border-t-gold" />
-              <span className="label">Preparing form Â· Ambot365 Â· {progress}%</span>
+              <span className="size-9 animate-spin rounded-full border border-ink/20 border-t-accent" />
+              <span className="label text-ink/70">Preparing form · Ambot365 · {progress}%</span>
             </div>
           </motion.div>
         </div>
@@ -100,7 +99,3 @@ export function ProductPackScroll({ mobileContent }) {
     </section>
   )
 }
-
-
-
-

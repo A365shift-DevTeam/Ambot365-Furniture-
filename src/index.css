@@ -1,14 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #f6f3ed;
-  --color-ink: #121414;
-  --color-border: #dcd5c7;
-  --color-accent: #b55c35;
-  --color-brand-forest: #0f1211;
-  --color-gold: #caa777;
-  --color-parchment: #e8e0d1;
+  --color-surface: #faf7f2;
+  --color-surface-warm: #f2ece1;
+  --color-ink: #141716;
+  --color-ink-muted: #59615e;
+  --color-border: #e2dacd;
+  --color-border-dark: #cbd0cd;
+  --color-accent: #b85428;
+  --color-accent-hover: #9c4118;
+  --color-brand-forest: #faf7f2;
+  --color-brand-forest-light: #f2ece1;
+  --color-gold: #b58544;
+  --color-gold-glow: #d6a45e;
+  --color-parchment: #eee6d8;
+  --color-parchment-light: #f7f2e7;
   --font-display: "Space Grotesk", sans-serif;
   --font-sans: "Inter", sans-serif;
   --font-serif: "Cormorant Garamond", serif;
@@ -16,15 +23,27 @@
 }
 
 :root {
-  --nav-height: 3.5rem;
+  --nav-height: 4rem;
   color: var(--color-ink);
   background: var(--color-surface);
   font-family: var(--font-sans);
   font-synthesis: none;
 }
 
-html { scroll-behavior: auto; }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+html { 
+  scroll-behavior: auto; 
+  scroll-padding-top: var(--nav-height);
+}
+
+body { 
+  margin: 0; 
+  min-width: 320px; 
+  min-height: 100vh;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  overflow-x: hidden;
+}
+
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
@@ -32,20 +51,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 @utility section-wrap {
   width: 100%;
-  max-width: 80rem;
+  max-width: 82rem;
   margin-inline: auto;
-  padding-inline: 1rem;
-  @media (width >= 40rem) { padding-inline: 1.5rem; }
-  @media (width >= 48rem) { padding-inline: 2.5rem; }
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) { padding-inline: 2rem; }
+  @media (width >= 64rem) { padding-inline: 3rem; }
 }
 
 @utility label {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   line-height: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.35em;
-  @media (width >= 40rem) { font-size: 0.75rem; line-height: 1rem; }
+  letter-spacing: 0.28em;
+  @media (width >= 40rem) { font-size: 0.75rem; }
 }
 
 @utility grid-adaptive-2 {
@@ -73,24 +92,79 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .display-heading {
   font-family: var(--font-serif);
-  font-size: 2.125rem;
-  line-height: 1.08;
+  font-size: 2.25rem;
+  line-height: 1.05;
   letter-spacing: -0.025em;
+  font-weight: 500;
 }
 
-@media (min-width: 640px) { .display-heading { font-size: 2.875rem; } }
-@media (min-width: 768px) { .display-heading { font-size: 3.625rem; } }
+@media (min-width: 640px) { .display-heading { font-size: 3rem; } }
+@media (min-width: 768px) { .display-heading { font-size: 3.75rem; } }
+@media (min-width: 1024px) { .display-heading { font-size: 4.25rem; } }
 
 .grain::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.055;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+  z-index: 1;
 }
 
-.focus-ring:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+.focus-ring:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+/* Custom Luxury Lighting Filters for Spatial Visualizer */
+.lighting-daylight {
+  filter: contrast(102%) brightness(102%) saturate(98%);
+}
+.lighting-golden {
+  filter: sepia(25%) contrast(105%) brightness(98%) hue-rotate(-10deg);
+}
+.lighting-night {
+  filter: contrast(115%) brightness(85%) hue-rotate(5deg);
+}
+
+/* Glassmorphic Cards Light Theme */
+.glass-panel-light {
+  background: rgba(250, 247, 242, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(20, 23, 22, 0.08);
+}
+
+/* Gold Shimmer border glow */
+.gold-border-glow {
+  position: relative;
+}
+.gold-border-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(181, 133, 68, 0.5), transparent 50%, rgba(184, 84, 40, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar for Spec Drawers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(184, 84, 40, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(184, 84, 40, 0.5);
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
