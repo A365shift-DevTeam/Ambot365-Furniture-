@@ -3,8 +3,7 @@ import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { useIsMobile } from '../hooks/useIsMobile'
 
 const FRAME_COUNT = 120
-const frameUrl = (index, isMobile) =>
-  `/${isMobile ? 'frames' : 'frames-hd'}/frame-${String(index + 1).padStart(4, '0')}.webp`
+const frameUrl = (index) => `/frames/frame-${String(index + 1).padStart(4, '0')}.webp`
 
 export function ProductPackScroll({ mobileContent }) {
   const containerRef = useRef(null)
@@ -51,7 +50,7 @@ export function ProductPackScroll({ mobileContent }) {
     imagesRef.current = Array.from({ length: FRAME_COUNT }, (_, index) => {
       const image = new Image()
       image.decoding = 'async'
-      image.src = frameUrl(index, isMobile)
+      image.src = frameUrl(index)
       image.onload = () => {
         if (!active) return
         loaded += 1
@@ -101,6 +100,7 @@ export function ProductPackScroll({ mobileContent }) {
     </section>
   )
 }
+
 
 
 
