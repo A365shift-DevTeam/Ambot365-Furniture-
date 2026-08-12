@@ -4,4 +4,20 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    target: 'es2022',
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'motion-vendor': ['motion'],
+          'lenis-vendor': ['lenis'],
+          'icons-vendor': ['lucide-react'],
+        },
+      },
+    },
+  },
 })
