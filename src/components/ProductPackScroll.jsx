@@ -5,11 +5,13 @@ import { useIsMobile } from '../hooks/useIsMobile'
 const FRAME_COUNT = 120
 const MILESTONE_STEP = 10 // Load every 10th frame in priority phase
 const frameUrl = (index) => `/frames/frame-${String(index + 1).padStart(4, '0')}.webp`
+const HERO_DEFAULT_IMAGE = '/hero-default.jpeg'
 
 export function ProductPackScroll({ mobileContent }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
   const imagesRef = useRef([])
+  const heroDefaultRef = useRef(null)
   const loadedMapRef = useRef(new Uint8Array(FRAME_COUNT))
   const currentFrameRef = useRef(0)
   const [progress, setProgress] = useState(0)
@@ -36,8 +38,15 @@ export function ProductPackScroll({ mobileContent }) {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const actualIndex = getClosestLoadedFrame(requestedIndex)
-    const image = imagesRef.current[actualIndex]
+    // If at index 0 (initial rest position) and hero default image is ready, render default hero view
+    let image
+    if (requestedIndex === 0 && heroDefaultRef.current && heroDefaultRef.current.complete) {
+      image = heroDefaultRef.current
+    } else {
+      const actualIndex = getClosestLoadedFrame(requestedIndex)
+      image = imagesRef.current[actualIndex]
+    }
+
     if (!image || !image.complete) return
 
     const context = canvas.getContext('2d', { alpha: false })
@@ -67,11 +76,25 @@ export function ProductPackScroll({ mobileContent }) {
     context.drawImage(image, x, y, drawWidth, drawHeight)
   }, [isMobile, getClosestLoadedFrame])
 
-  // 3-Stage Smart Preloading Engine
+  // 3-Stage Smart Preloading Engine + Hero Default View
   useEffect(() => {
     let active = true
     let totalLoaded = 0
     imagesRef.current = new Array(FRAME_COUNT)
+
+    // Load Default Hero Showcase Image
+    const defaultHeroImg = new Image()
+    defaultHeroImg.decoding = 'async'
+    if ('fetchPriority' in defaultHeroImg) defaultHeroImg.fetchPriority = 'high'
+    defaultHeroImg.src = HERO_DEFAULT_IMAGE
+    defaultHeroImg.onload = () => {
+      if (!active) return
+      heroDefaultRef.current = defaultHeroImg
+      if (currentFrameRef.current === 0) {
+        draw(0)
+        setReady(true)
+      }
+    }
 
     const handleImageLoad = (index) => {
       if (!active) return
@@ -79,9 +102,9 @@ export function ProductPackScroll({ mobileContent }) {
       totalLoaded += 1
       setProgress(Math.round((totalLoaded / FRAME_COUNT) * 100))
 
-      // Stage 1 Complete: First frame loaded -> Draw immediately & unlock UI
+      // Stage 1 Complete: First frame loaded -> Draw & unlock UI
       if (index === 0) {
-        draw(0)
+        if (!heroDefaultRef.current) draw(0)
         setReady(true)
       }
 
