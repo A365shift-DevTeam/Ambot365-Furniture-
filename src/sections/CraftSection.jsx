@@ -55,7 +55,7 @@ export function CraftSection() {
   const [activeHotspot, setActiveHotspot] = useState(HOTSPOTS[0])
 
   return (
-    <section id="craft" className="grain relative overflow-hidden bg-parchment/60 py-16 text-ink sm:py-20 md:py-24 lg:py-32 border-t border-border">
+    <section id="craft" className="grain relative overflow-hidden bg-golden-parchment py-16 text-ink sm:py-20 md:py-24 lg:py-32 border-t border-border">
       <div className="section-wrap relative z-10">
         {/* Section Title Bar */}
         <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between border-b border-ink/15 pb-8 gap-6">

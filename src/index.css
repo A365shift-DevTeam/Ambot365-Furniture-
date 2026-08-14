@@ -1,20 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #faf7f2;
-  --color-surface-warm: #f2ece1;
-  --color-ink: #141716;
-  --color-ink-muted: #59615e;
-  --color-border: #e2dacd;
-  --color-border-dark: #cbd0cd;
-  --color-accent: #b85428;
-  --color-accent-hover: #9c4118;
-  --color-brand-forest: #faf7f2;
-  --color-brand-forest-light: #f2ece1;
-  --color-gold: #b58544;
-  --color-gold-glow: #d6a45e;
-  --color-parchment: #eee6d8;
-  --color-parchment-light: #f7f2e7;
+  --color-surface: #FDFBF7;
+  --color-surface-warm: #F4ECD9;
+  --color-ink: #1B1813;
+  --color-ink-muted: #695E4E;
+  --color-border: #E6D7B8;
+  --color-border-dark: #C4973B;
+  --color-accent: #C4973B;
+  --color-accent-hover: #9E7422;
+  --color-brand-forest: #FDFBF7;
+  --color-brand-forest-light: #F4ECD9;
+  --color-gold: #D4AF37;
+  --color-gold-glow: #E7C960;
+  --color-gold-dark: #8A6D1F;
+  --color-gold-bg: #F8F2E4;
+  --color-gold-bg-warm: #F3E7CF;
+  --color-parchment: #F2E5C9;
+  --color-parchment-light: #FBF7ED;
   --font-display: "Space Grotesk", sans-serif;
   --font-sans: "Inter", sans-serif;
   --font-serif: "Cormorant Garamond", serif;
@@ -137,10 +140,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 /* Glassmorphic Cards Light Theme */
 .glass-panel-light {
-  background: rgba(250, 247, 242, 0.85);
+  background: rgba(253, 251, 247, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(20, 23, 22, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 /* Gold Shimmer border glow */
@@ -153,11 +156,31 @@ button, a { -webkit-tap-highlight-color: transparent; }
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(181, 133, 68, 0.5), transparent 50%, rgba(184, 84, 40, 0.3));
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.6), transparent 50%, rgba(196, 151, 59, 0.4));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* Golden Section Background Gradients */
+.bg-golden-section {
+  background: linear-gradient(180deg, #FDFBF7 0%, #F5ECE0 50%, #EFE3CE 100%);
+}
+
+.bg-golden-parchment {
+  background: linear-gradient(180deg, #F5ECE0 0%, #F8F2E6 50%, #F3E6CF 100%);
+}
+
+.bg-golden-card {
+  background: linear-gradient(145deg, #FBF7EE 0%, #F4EAD6 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+/* Custom Selection in Gold */
+::selection {
+  background-color: #D4AF37;
+  color: #0A0907;
 }
 
 /* Custom Scrollbar for Spec Drawers */
@@ -169,11 +192,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(184, 84, 40, 0.25);
+  background: rgba(212, 175, 55, 0.35);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(184, 84, 40, 0.5);
+  background: rgba(212, 175, 55, 0.65);
 }
 
 @media (prefers-reduced-motion: reduce) {

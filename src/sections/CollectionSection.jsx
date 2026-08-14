@@ -75,7 +75,7 @@ export function CollectionSection() {
     : PIECES.filter((p) => p.category === activeCategory)
 
   return (
-    <section id="collection" className="bg-surface py-16 sm:py-20 md:py-24 lg:py-32">
+    <section id="collection" className="bg-golden-section py-16 sm:py-20 md:py-24 lg:py-32">
       <div className="section-wrap">
         {/* Header */}
         <Reveal className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6 border-b border-border pb-8">

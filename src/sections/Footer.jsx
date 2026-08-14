@@ -57,7 +57,7 @@ export function Footer() {
   }
 
   return (
-    <footer id="contact" className="bg-surface-warm py-16 text-ink sm:py-20 md:py-24 lg:py-32 relative overflow-hidden border-t border-border">
+    <footer id="contact" className="bg-golden-parchment py-16 text-ink sm:py-20 md:py-24 lg:py-32 relative overflow-hidden border-t border-border">
       <div className="section-wrap relative z-10">
         {/* Main 4-Grid Footer Top */}
         <div className="grid grid-adaptive-4 gap-10 border-b border-ink/15 pb-16">

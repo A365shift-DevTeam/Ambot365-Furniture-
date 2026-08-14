@@ -14,6 +14,7 @@ export function ProductPackScroll({ mobileContent }) {
   const currentFrameRef = useRef(0)
   const loadImageRef = useRef(null)
   const [canvasReady, setCanvasReady] = useState(false)
+  const [hasScrolled, setHasScrolled] = useState(false)
   const isMobile = useIsMobile()
 
   const getClosestLoadedFrame = useCallback((targetIndex) => {
@@ -201,6 +202,9 @@ export function ProductPackScroll({ mobileContent }) {
       const nextFrame = Math.min(FRAME_COUNT - 1, Math.round(rawFrame / frameStep) * frameStep)
       const shouldRequestFrame = !isMobile || progress > 0.005
 
+      const isScrolled = progress > 0.005
+      setHasScrolled((prev) => (prev !== isScrolled ? isScrolled : prev))
+
       if (shouldRequestFrame && loadImageRef.current && !loadedMapRef.current[nextFrame]) {
         loadImageRef.current(nextFrame, 'high')
       }
@@ -242,7 +246,7 @@ export function ProductPackScroll({ mobileContent }) {
           </picture>
           <canvas
             ref={canvasRef}
-            className={`absolute inset-0 block h-full w-full touch-none transition-opacity duration-300 ${canvasReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 block h-full w-full touch-none transition-opacity duration-500 ${canvasReady && hasScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             aria-hidden="true"
           />
         </div>

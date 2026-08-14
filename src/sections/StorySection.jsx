@@ -51,7 +51,7 @@ export function StorySection({ compact = false }) {
   const currentPhilosophy = PHILOSOPHIES[activeTab]
 
   return (
-    <section id={compact ? undefined : 'story-desktop'} className={`${compact ? 'bg-surface py-12' : 'hidden bg-surface py-16 sm:py-20 md:py-24 lg:block lg:py-32'}`}>
+    <section id={compact ? undefined : 'story-desktop'} className={`${compact ? 'bg-golden-section py-12' : 'hidden bg-golden-section py-16 sm:py-20 md:py-24 lg:block lg:py-32'}`}>
       <div className="section-wrap">
         {/* Section Tag Header */}
         <Reveal className="mb-8 flex items-center justify-between border-b border-border/80 pb-5">

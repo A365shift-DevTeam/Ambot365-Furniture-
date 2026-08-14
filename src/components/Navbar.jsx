@@ -64,7 +64,7 @@ export function Navbar() {
       <header
         className={`fixed inset-x-0 top-0 z-80 h-14 md:h-16 text-ink transition-all duration-500 ease-out ${
           isSolidHeader
-            ? 'border-b border-ink/10 bg-surface/95 shadow-md backdrop-blur-xl'
+            ? 'border-b border-gold/30 bg-[#FDFBF7]/92 shadow-md backdrop-blur-xl'
             : 'border-b border-transparent bg-transparent shadow-none backdrop-blur-none'
         }`}
       >
