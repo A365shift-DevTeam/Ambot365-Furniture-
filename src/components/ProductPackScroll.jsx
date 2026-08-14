@@ -1,52 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { useIsMobile } from '../hooks/useIsMobile'
 
 const FRAME_COUNT = 120
-const MILESTONE_STEP = 10 // Load every 10th frame in priority phase
+const MILESTONE_STEP = 10
+const MOBILE_FRAME_STEP = 2
 const frameUrl = (index) => `/frames/frame-${String(index + 1).padStart(4, '0')}.webp`
-const HERO_DEFAULT_IMAGE = '/hero-default.jpeg'
 
 export function ProductPackScroll({ mobileContent }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
   const imagesRef = useRef([])
-  const heroDefaultRef = useRef(null)
   const loadedMapRef = useRef(new Uint8Array(FRAME_COUNT))
   const currentFrameRef = useRef(0)
-  const [progress, setProgress] = useState(0)
-  const [ready, setReady] = useState(false)
+  const loadImageRef = useRef(null)
+  const [canvasReady, setCanvasReady] = useState(false)
   const isMobile = useIsMobile()
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] })
 
-  // Find closest loaded frame if target frame isn't ready yet
   const getClosestLoadedFrame = useCallback((targetIndex) => {
     if (loadedMapRef.current[targetIndex]) return targetIndex
-    
-    // Search outwards from targetIndex
+
     for (let delta = 1; delta < FRAME_COUNT; delta++) {
       const prev = targetIndex - delta
       if (prev >= 0 && loadedMapRef.current[prev]) return prev
+
       const next = targetIndex + delta
       if (next < FRAME_COUNT && loadedMapRef.current[next]) return next
     }
-    return 0 // Fallback to initial frame
+
+    return 0
   }, [])
 
-  // Optimized Canvas Drawing Loop
   const draw = useCallback((requestedIndex = currentFrameRef.current) => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // If at index 0 (initial rest position) and hero default image is ready, render default hero view
-    let image
-    if (requestedIndex === 0 && heroDefaultRef.current && heroDefaultRef.current.complete) {
-      image = heroDefaultRef.current
-    } else {
-      const actualIndex = getClosestLoadedFrame(requestedIndex)
-      image = imagesRef.current[actualIndex]
-    }
-
+    const actualIndex = getClosestLoadedFrame(requestedIndex)
+    const image = imagesRef.current[actualIndex]
     if (!image || !image.complete) return
 
     const context = canvas.getContext('2d', { alpha: false })
@@ -73,133 +62,189 @@ export function ProductPackScroll({ mobileContent }) {
     const drawHeight = image.naturalHeight * scale
     const x = (bounds.width - drawWidth) / 2
     const y = isMobile ? 0 : (bounds.height - drawHeight) / 2
-    context.drawImage(image, x, y, drawWidth, drawHeight)
-  }, [isMobile, getClosestLoadedFrame])
 
-  // 3-Stage Smart Preloading Engine + Hero Default View
+    context.drawImage(image, x, y, drawWidth, drawHeight)
+    setCanvasReady(true)
+  }, [getClosestLoadedFrame, isMobile])
+
   useEffect(() => {
     let active = true
-    let totalLoaded = 0
-    imagesRef.current = new Array(FRAME_COUNT)
+    let started = false
 
-    // Load Default Hero Showcase Image
-    const defaultHeroImg = new Image()
-    defaultHeroImg.decoding = 'async'
-    if ('fetchPriority' in defaultHeroImg) defaultHeroImg.fetchPriority = 'high'
-    defaultHeroImg.src = HERO_DEFAULT_IMAGE
-    defaultHeroImg.onload = () => {
-      if (!active) return
-      heroDefaultRef.current = defaultHeroImg
-      if (currentFrameRef.current === 0) {
-        draw(0)
-        setReady(true)
-      }
+    imagesRef.current = new Array(FRAME_COUNT)
+    loadedMapRef.current = new Uint8Array(FRAME_COUNT)
+    currentFrameRef.current = 0
+    setCanvasReady(false)
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReducedMotion) {
+      loadImageRef.current = null
+      return () => { active = false }
     }
 
     const handleImageLoad = (index) => {
       if (!active) return
       loadedMapRef.current[index] = 1
-      totalLoaded += 1
-      setProgress(Math.round((totalLoaded / FRAME_COUNT) * 100))
-
-      // Stage 1 Complete: First frame loaded -> Draw & unlock UI
-      if (index === 0) {
-        if (!heroDefaultRef.current) draw(0)
-        setReady(true)
-      }
 
       if (index === currentFrameRef.current) {
         draw(index)
       }
     }
 
-    // Helper to create & load a single image
     const loadImage = (index, priority = 'auto') => {
       if (imagesRef.current[index]) return imagesRef.current[index]
+
       const img = new Image()
       img.decoding = 'async'
       if ('fetchPriority' in img) img.fetchPriority = priority
-      img.src = frameUrl(index)
       img.onload = () => handleImageLoad(index)
+      img.src = frameUrl(index)
       imagesRef.current[index] = img
+
       return img
     }
 
-    // Stage 1: Load Hero Frame 0 IMMEDIATELY with high priority
-    loadImage(0, 'high')
+    loadImageRef.current = loadImage
 
-    // Stage 2: Load Key Milestone Frames (0, 10, 20, 30...)
-    const milestoneIndices = []
-    for (let i = 0; i < FRAME_COUNT; i += MILESTONE_STEP) {
-      if (i !== 0) milestoneIndices.push(i)
-    }
+    const startMilestoneLoading = (priority = 'low') => {
+      loadImage(0, priority)
 
-    milestoneIndices.forEach((idx) => loadImage(idx, 'high'))
-
-    // Stage 3: Batch load remaining intermediate frames asynchronously
-    const remainingIndices = []
-    for (let i = 0; i < FRAME_COUNT; i++) {
-      if (i % MILESTONE_STEP !== 0) remainingIndices.push(i)
-    }
-
-    let batchOffset = 0
-    const BATCH_SIZE = 8
-
-    const loadNextBatch = () => {
-      if (!active || batchOffset >= remainingIndices.length) return
-      const batch = remainingIndices.slice(batchOffset, batchOffset + BATCH_SIZE)
-      batch.forEach((idx) => loadImage(idx, 'low'))
-      batchOffset += BATCH_SIZE
-
-      if (batchOffset < remainingIndices.length) {
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(loadNextBatch, { timeout: 250 })
-        } else {
-          setTimeout(loadNextBatch, 50)
-        }
+      for (let i = MILESTONE_STEP; i < FRAME_COUNT; i += MILESTONE_STEP) {
+        loadImage(i, priority)
       }
     }
 
-    // Start background batching after milestones initiated
-    setTimeout(loadNextBatch, 100)
+    const startBatchedLoading = () => {
+      const remainingIndices = []
+      const frameStep = isMobile ? MOBILE_FRAME_STEP : 1
 
-    return () => { active = false }
-  }, [draw])
+      for (let i = 0; i < FRAME_COUNT; i += frameStep) {
+        if (i % MILESTONE_STEP !== 0) remainingIndices.push(i)
+      }
+
+      let batchOffset = 0
+      const batchSize = isMobile ? 4 : 8
+
+      const loadNextBatch = () => {
+        if (!active || batchOffset >= remainingIndices.length) return
+
+        const batch = remainingIndices.slice(batchOffset, batchOffset + batchSize)
+        batch.forEach((idx) => loadImage(idx, 'low'))
+        batchOffset += batchSize
+
+        if (batchOffset < remainingIndices.length) {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadNextBatch, { timeout: 400 })
+          } else {
+            setTimeout(loadNextBatch, 80)
+          }
+        }
+      }
+
+      loadNextBatch()
+    }
+
+    const startFrameLoading = (priority = 'low') => {
+      if (started) return
+      started = true
+      startMilestoneLoading(priority)
+      startBatchedLoading()
+    }
+
+    const startOnIntent = () => startFrameLoading('high')
+
+    if (isMobile) {
+      window.addEventListener('scroll', startOnIntent, { once: true, passive: true })
+      window.addEventListener('touchstart', startOnIntent, { once: true, passive: true })
+      window.addEventListener('pointerdown', startOnIntent, { once: true, passive: true })
+    } else {
+      startMilestoneLoading('high')
+
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => startFrameLoading('low'), { timeout: 800 })
+      } else {
+        setTimeout(() => startFrameLoading('low'), 250)
+      }
+    }
+
+    return () => {
+      active = false
+      loadImageRef.current = null
+      window.removeEventListener('scroll', startOnIntent)
+      window.removeEventListener('touchstart', startOnIntent)
+      window.removeEventListener('pointerdown', startOnIntent)
+    }
+  }, [draw, isMobile])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return undefined
+
     const observer = new ResizeObserver(() => draw())
     observer.observe(canvas)
+
     return () => observer.disconnect()
   }, [draw])
 
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    const nextFrame = Math.min(FRAME_COUNT - 1, Math.floor(latest * FRAME_COUNT))
-    if (nextFrame !== currentFrameRef.current) {
-      currentFrameRef.current = nextFrame
-      requestAnimationFrame(() => draw(nextFrame))
+  useEffect(() => {
+    let rafId = 0
+
+    const updateFrameFromScroll = () => {
+      const container = containerRef.current
+      if (!container) return
+
+      const rect = container.getBoundingClientRect()
+      const scrollDistance = Math.max(1, rect.height - window.innerHeight)
+      const progress = Math.min(1, Math.max(0, -rect.top / scrollDistance))
+      const rawFrame = Math.min(FRAME_COUNT - 1, Math.floor(progress * FRAME_COUNT))
+      const frameStep = isMobile ? MOBILE_FRAME_STEP : 1
+      const nextFrame = Math.min(FRAME_COUNT - 1, Math.round(rawFrame / frameStep) * frameStep)
+      const shouldRequestFrame = !isMobile || progress > 0.005
+
+      if (shouldRequestFrame && loadImageRef.current && !loadedMapRef.current[nextFrame]) {
+        loadImageRef.current(nextFrame, 'high')
+      }
+
+      if (nextFrame !== currentFrameRef.current) {
+        currentFrameRef.current = nextFrame
+        cancelAnimationFrame(rafId)
+        rafId = requestAnimationFrame(() => draw(nextFrame))
+      }
     }
-  })
+
+    updateFrameFromScroll()
+    window.addEventListener('scroll', updateFrameFromScroll, { passive: true })
+    window.addEventListener('resize', updateFrameFromScroll, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('scroll', updateFrameFromScroll)
+      window.removeEventListener('resize', updateFrameFromScroll)
+    }
+  }, [draw, isMobile])
 
   return (
     <section id="top" ref={containerRef} className="relative h-[550vh] bg-surface lg:h-[500vh]" aria-label="Ambot365 chair in motion">
       <div className="sticky top-0 h-[100dvh]">
         <div className="relative w-full bg-surface lg:h-full">
-          <canvas ref={canvasRef} className="block aspect-video w-full touch-none lg:h-full lg:aspect-auto" />
-          
-          {/* Smooth Fade Preloader Overlay */}
-          <motion.div
-            animate={{ opacity: ready ? 0 : 1, pointerEvents: ready ? 'none' : 'auto' }}
-            transition={{ duration: 0.4 }}
-            className="absolute inset-0 grid place-items-center bg-surface text-ink z-30"
-            aria-live="polite"
-          >
-            <div className="flex flex-col items-center gap-4">
-              <span className="size-9 animate-spin rounded-full border-2 border-ink/20 border-t-accent" />
-              <span className="label text-ink/70">CURATING STUDIO COLLECTION · AMBOT365 · {progress}%</span>
-            </div>
-          </motion.div>
+          <picture>
+            <source media="(max-width: 767px)" srcSet="/hero-default-720.webp" type="image/webp" />
+            <source media="(min-width: 768px)" srcSet="/hero-default-1440.webp" type="image/webp" />
+            <img
+              src="/hero-default-1440.webp"
+              width="2752"
+              height="1536"
+              alt="Ambot365 signature lounge chair in a warm furniture studio"
+              className="block aspect-video w-full object-contain object-top lg:h-full lg:aspect-auto lg:object-cover lg:object-center"
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
+          <canvas
+            ref={canvasRef}
+            className={`absolute inset-0 block h-full w-full touch-none transition-opacity duration-300 ${canvasReady ? 'opacity-100' : 'opacity-0'}`}
+            aria-hidden="true"
+          />
         </div>
         <div id="story" className="lg:hidden">{mobileContent}</div>
       </div>

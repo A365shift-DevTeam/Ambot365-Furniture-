@@ -64,7 +64,7 @@ export function Footer() {
           {/* Brand Info & Newsletter */}
           <div className="sm:col-span-2 lg:col-span-2 lg:pr-12">
             <div className="flex items-center gap-3">
-              <img src="/ambot-logo.png" alt="Ambot365 Logo" className="h-8 w-auto object-contain" />
+              <img src="/ambot-logo.webp" width="96" height="96" alt="Ambot365 Logo" className="h-8 w-auto object-contain" loading="lazy" decoding="async" />
               <span className="font-display text-xl font-semibold tracking-[0.25em] text-ink">AMBOT365</span>
             </div>
 

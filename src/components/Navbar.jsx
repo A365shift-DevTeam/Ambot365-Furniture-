@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
 import { Menu, X, ArrowUpRight } from 'lucide-react'
-import { useLenis } from 'lenis/react'
 
 const links = [
   { label: 'Story', target: 'story' },
@@ -12,7 +10,6 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [isPassedFrames, setIsPassedFrames] = useState(false)
-  const lenis = useLenis()
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -50,11 +47,13 @@ export function Navbar() {
     const storyId = window.innerWidth >= 1024 ? 'story-desktop' : 'story'
     const targetId = target === 'story' ? storyId : target
     const node = document.getElementById(targetId)
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+
     if (node) {
-      lenis?.scrollTo(node, { offset: -60, duration: 1.15 })
+      node.scrollIntoView({ behavior, block: 'start' })
     } else {
       const fallbackNode = document.getElementById(target)
-      if (fallbackNode) fallbackNode.scrollIntoView({ behavior: 'smooth' })
+      if (fallbackNode) fallbackNode.scrollIntoView({ behavior, block: 'start' })
     }
   }
 
@@ -72,7 +71,7 @@ export function Navbar() {
         <div className="section-wrap flex h-full items-center justify-between gap-2 sm:gap-4">
           {/* Logo */}
           <button onClick={() => goTo('top')} className="focus-ring flex items-center gap-2 sm:gap-3 active:opacity-70" aria-label="Ambot365 home">
-            <img src="/ambot-logo.png" alt="Ambot365 Logo" className="h-6 w-auto object-contain sm:h-7 md:h-8" />
+            <img src="/ambot-logo.webp" width="96" height="96" alt="Ambot365 Logo" className="h-6 w-auto object-contain sm:h-7 md:h-8" />
             <span className="font-display text-xs font-semibold tracking-[0.18em] sm:text-sm sm:tracking-[0.25em] md:text-[16px] text-ink">
               AMBOT365
             </span>
@@ -116,50 +115,36 @@ export function Navbar() {
       </header>
 
       {/* Mobile Navigation Overlay Menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-70 bg-surface px-6 pt-20 text-ink md:hidden"
-          >
+      {open && (
+          <div className="fixed inset-0 z-70 bg-surface px-6 pt-20 text-ink md:hidden">
             <nav className="mx-auto flex max-w-xl flex-col border-t border-ink/15" aria-label="Mobile navigation">
               {links.map((link, index) => (
-                <motion.button
+                <button
                   key={link.target}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
                   onClick={() => goTo(link.target)}
                   className="focus-ring flex min-h-16 items-center justify-between border-b border-ink/15 text-left font-serif text-[26px] active:opacity-70 text-ink"
                 >
                   <span>{link.label}</span>
                   <span className="font-mono text-xs text-accent">0{index + 1}</span>
-                </motion.button>
+                </button>
               ))}
 
               {/* Book CTA Button Inside Mobile Menu */}
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: links.length * 0.05 + 0.05 }}
+              <button
                 onClick={() => goTo('contact')}
                 className="focus-ring mt-6 flex min-h-13 w-full items-center justify-between rounded-full bg-ink px-6 font-display text-sm font-semibold uppercase tracking-wider text-surface transition-transform active:scale-95 shadow-md"
               >
                 <span>Book Commission</span>
                 <ArrowUpRight size={18} />
-              </motion.button>
+              </button>
             </nav>
 
             <div className="mx-auto mt-8 max-w-xl">
               <p className="label text-ink/50">Bespoke Furniture · London Studio</p>
               <p className="mt-2 text-xs text-ink/70">48 Foundry Lane, EC1 · info@ambot365.com</p>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </>
   )
 }

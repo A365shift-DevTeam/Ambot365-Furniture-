@@ -53,7 +53,6 @@ const FEATURES = [
 
 export function CraftSection() {
   const [activeHotspot, setActiveHotspot] = useState(HOTSPOTS[0])
-  const [isAudioActive, setIsAudioActive] = useState(false)
 
   return (
     <section id="craft" className="grain relative overflow-hidden bg-parchment/60 py-16 text-ink sm:py-20 md:py-24 lg:py-32 border-t border-border">

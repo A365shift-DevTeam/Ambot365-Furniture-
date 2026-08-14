@@ -1,10 +1,12 @@
+import { Suspense, lazy } from 'react'
 import { SmoothScroll } from './components/SmoothScroll'
 import { Navbar } from './components/Navbar'
 import { ProductPackScroll } from './components/ProductPackScroll'
 import { StorySection } from './sections/StorySection'
-import { CraftSection } from './sections/CraftSection'
-import { CollectionSection } from './sections/CollectionSection'
-import { Footer } from './sections/Footer'
+
+const CraftSection = lazy(() => import('./sections/CraftSection').then((module) => ({ default: module.CraftSection })))
+const CollectionSection = lazy(() => import('./sections/CollectionSection').then((module) => ({ default: module.CollectionSection })))
+const Footer = lazy(() => import('./sections/Footer').then((module) => ({ default: module.Footer })))
 
 export default function App() {
   return (
@@ -14,10 +16,14 @@ export default function App() {
         <main>
           <ProductPackScroll mobileContent={<StorySection compact />} />
           <StorySection />
-          <CraftSection />
-          <CollectionSection />
+          <Suspense fallback={null}>
+            <CraftSection />
+            <CollectionSection />
+          </Suspense>
         </main>
-        <Footer />
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
       </div>
     </SmoothScroll>
   )

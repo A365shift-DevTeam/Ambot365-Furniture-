@@ -1,15 +1,40 @@
-import { motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 
-export function Reveal({ children, className = '', delay = 0 }) {
+export function Reveal({ children, className = '', delay = 0, style, ...props }) {
+  const ref = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return undefined
+
+    if (!('IntersectionObserver' in window)) {
+      setIsVisible(true)
+      return undefined
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.72, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
+    <div
+      ref={ref}
+      className={`reveal ${isVisible ? 'is-visible' : ''} ${className}`}
+      style={{ ...style, transitionDelay: isVisible && delay ? `${delay}s` : undefined }}
+      {...props}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
